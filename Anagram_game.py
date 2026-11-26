@@ -1,7 +1,7 @@
 
 import random
 
-"""
+
 def load_words():
     with open("words_alpha.txt", "r", encoding="utf-8") as file:
         words = file.read().splitlines()
@@ -9,40 +9,14 @@ def load_words():
     words = [
         word.strip().lower()
         for word in words
-        if word.strip().isalpha() and 4 <= len(word.strip()) <= 8
+        if word.strip().isalpha()
+        and 4 <= len(word.strip()) <= 8
     ]
 
+    if not words:
+        raise ValueError("The dictionary contains no valid words.")
+
     return words
-"""
-
-
-def load_words():
-    try:
-        with open("words_alpha.txt", "r", encoding="utf-8") as file:
-            words = file.read().splitlines()
-
-        words = [
-            word.strip().lower()
-            for word in words
-            if word.strip().isalpha()
-            and 4 <= len(word.strip()) <= 8
-        ]
-
-        if not words:
-            raise ValueError("The dictionary contains no valid words.")
-
-        return words
-
-    except FileNotFoundError:
-        print("Error: words_alpha.txt was not found.")
-        return []
-
-    except ValueError as error:
-        print(error)
-        return []
-
-
-words = load_words()
 
 
 def scramble_word(word):
@@ -64,7 +38,6 @@ def play_game():
     print("Unscramble the letters to find the word!")
     print("You have 3 lives.")
 
-  
     while lives > 0:
         word = random.choice(words)
         scrambled = scramble_word(word)
@@ -76,6 +49,10 @@ def play_game():
 
             if guess == "hint":
                 print("Hint: The word starts with the letter '" + word[0].upper() + "'")
+
+            elif len(guess) != len(word):
+                print("Your guess must contain", len(word), "letters. Try again.")
+
             else:
                 break
 
@@ -83,6 +60,7 @@ def play_game():
             points = len(word)
             score = score + points
             print("Correct! You earned", points, "points.")
+
         else:
             lives = lives - 1
             print("Wrong guess! The correct word was:", word)
@@ -92,5 +70,9 @@ def play_game():
     print("Final score:", score)
 
 
+try:
+    words = load_words()
+    play_game()
 
-play_game()
+except (FileNotFoundError, ValueError) as error:
+    print("Something went wrong:", error)
